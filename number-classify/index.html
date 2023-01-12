@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TensorFlow.js Tutorial</title>
+</head>
+
+<body>
+  <canvas id="canvas" class="canvas" width="500" height="500"></canvas>
+  <button id="clearCanvas">清除</button>
+
+  <!-- Import TensorFlow.js -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.0/dist/tf.min.js"></script>
+  <!-- Import tfjs-vis -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-vis@1.0.2/dist/tfjs-vis.umd.min.js"></script>
+
+  <!-- Import the data file -->
+  <script src="data.js" type="module"></script>
+
+  <!-- Import the main script file -->
+  <script src="script.js" type="module"></script>
+
+  <script src="./canvas.js"></script>
+
+  <script>
+    const canvas = window.canvas = document.getElementById("canvas")
+    const drawingBoard = window.SimpleDrawingBoard
+    const sdb = drawingBoard.create(canvas);
+    sdb.setLineSize(10);
+    sdb.setLineColor("#0094c8");
+    sdb.fill("#fff");
+
+    sdb.observer.on("drawEnd", (coords) => {
+      const IMAGE_SIZE = 500
+      const datasetBytesBuffer = new ArrayBuffer(IMAGE_SIZE * 4)
+      const datasetBytesView = new Float32Array(datasetBytesBuffer, 0, IMAGE_SIZE);
+      const imageData = canvas.getContext('2d').getImageData(0, 0, IMAGE_SIZE, IMAGE_SIZE);
+
+      for (let j = 0; j < imageData.data.length / 4; j++) {
+        // All channels hold an equal value since the image is grayscale, so
+        // just read the red channel.
+        datasetBytesView[j] = imageData.data[j * 4] / 255;
+      }
+      
+      console.log(
+        '预测结果: ',
+        window.model.predict(datasetBytesView).argMax(-1)
+      )
+    });
+
+    document.getElementById('clearCanvas').addEventListener('click', () => sdb.clear())
+  </script>
+
+  <style>
+    .canvas {
+      border: 1px solid #000
+    }
+  </style>
+  
+</body>
+</html>
