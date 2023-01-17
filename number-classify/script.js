@@ -135,6 +135,7 @@ async function run() {
   tfvis.show.modelSummary({name: 'Model Architecture', tab: 'Model'}, model);
 
   await train(model, data);
+  await model.save('downloads://my-model-1')
 
   await showAccuracy(model, data);
   await showConfusion(model, data);

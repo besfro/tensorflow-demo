@@ -29,7 +29,7 @@
     const drawingBoard = window.SimpleDrawingBoard
     const sdb = drawingBoard.create(canvas);
     sdb.setLineSize(10);
-    sdb.setLineColor("#0094c8");
+    sdb.setLineColor("#333");
     sdb.fill("#fff");
 
     sdb.observer.on("drawEnd", (coords) => {
@@ -44,9 +44,10 @@
         datasetBytesView[j] = imageData.data[j * 4] / 255;
       }
       
+      const testImage = new Float32Array(datasetBytesBuffer);
       console.log(
         '预测结果: ',
-        window.model.predict(datasetBytesView).argMax(-1)
+        window.model.predict(testImage).argMax(-1)
       )
     });
 
