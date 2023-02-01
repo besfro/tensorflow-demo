@@ -1,3 +1,11 @@
+<!--
+ * @Name 
+ * @Description 
+ * @Author clc
+ * @Date 2023-01-12 16:47:16
+ * @LastEditTime 2023-02-01 10:00:29
+ * @Email Lengchars@gmail.com
+-->
 <!DOCTYPE html>
 <html>
 <head>
@@ -8,6 +16,9 @@
 </head>
 
 <body>
+  <img src="./gray.png" id="gray" width="10" height="10" border="0" style="opacity: .6;">
+  <img src="./two-value.png" id="twoValue" width="10" height="10" border="0">
+  <canvas id="draw" width="10" height="10"></canvas>
   <canvas id="canvas" class="canvas" width="500" height="500"></canvas>
   <button id="clearCanvas">清除</button>
 
@@ -52,6 +63,17 @@
     });
 
     document.getElementById('clearCanvas').addEventListener('click', () => sdb.clear())
+  </script>
+
+  <script>
+    (() => {
+      const draw = document.getElementById('draw')
+      const ctx = draw.getContext('2d')
+      ctx.drawImage(document.getElementById('twoValue'),0,0,10,10)
+      console.log(ctx.getImageData(0,0,10,10))
+      ctx.drawImage(document.getElementById('gray'),0,0,10,10)
+      console.log(ctx.getImageData(0,0,10,10))
+    })()
   </script>
 
   <style>

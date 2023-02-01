@@ -30,9 +30,20 @@ async function showExamples(data) {
 }
 
 
-function getModel() {
-  const model = tf.sequential();
+function loadModel() {
+  return new Promise(async resolve => {
+    try {
+      const model = await tf.loadLayersModel(STORAGE_KEY)
+      resolve(model)
+    } catch (e) {
+      resolve()
+      console.log(e)
+    }
+  })
+}
 
+function createNewModel () {
+  const model = tf.sequential();
   const IMAGE_WIDTH = 28;
   const IMAGE_HEIGHT = 28;
   const IMAGE_CHANNELS = 1;
@@ -90,6 +101,17 @@ function getModel() {
   return model;
 }
 
+const STORAGE_KEY = 'localstorage://my-model-1'
+
+async function getModel() {
+  const result = { model: await loadModel(), isNew: false }
+  if (!result.model) {
+    result.model = createNewModel()
+    result.isNew = true
+  }
+  return result
+}
+
 async function train(model, data) {
   const metrics = ['loss', 'val_loss', 'acc', 'val_acc'];
   const container = {
@@ -126,20 +148,25 @@ async function train(model, data) {
   });
 }
 
+
 async function run() {
   const data = new MnistData();
   await data.load();
   await showExamples(data);
   
-  const model = getModel();
-  tfvis.show.modelSummary({name: 'Model Architecture', tab: 'Model'}, model);
+  const { model, isNew } = await getModel()
 
-  await train(model, data);
-  await model.save('downloads://my-model-1')
+  // new model train model
+  if (isNew) {
+    tfvis.show.modelSummary({name: 'Model Architecture', tab: 'Model'}, model);
 
+    await train(model, data);
+    await model.save(STORAGE_KEY)
+  }
+
+  window.model = model
   await showAccuracy(model, data);
   await showConfusion(model, data);
-  window.model = model
 }
 
 document.addEventListener('DOMContentLoaded', run);
